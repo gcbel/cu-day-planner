@@ -15,6 +15,10 @@ This project is based on this reference provided by the Columbia University Full
 
 ![Reference image](assets/images/reference-gif.gif)
 
+TODO: 
+* get close out button to load
+* center add task button
+
 ## Installation
 
 N/A
@@ -30,6 +34,7 @@ The webpage features a light/dark toggle button, which changes the color scheme 
 ## Credits
 
 Starter code provided by Columbia University Bootcamp: https://github.com/coding-boot-camp/musical-happiness <br/>
+Modal functionality on lines 31 - 60 of index.hmtl adapted from Bootstrap Documentation: https://getbootstrap.com/docs/4.0/components/modal/
 
 ## License
 
