@@ -8,7 +8,7 @@ For this project, I created a website that allows users to create and store a li
 
 The final deployed desktop webpage:
 
-![Website image](assets/images/website-image.gif)
+![Website image](assets/images/website-image.png)
 
 This project is based on this reference provided by the Columbia University Full-Stack Bootcamp.
 
