@@ -16,7 +16,6 @@ This project is based on this reference provided by the Columbia University Full
 ![Reference image](assets/images/reference-gif.gif)
 
 TODO: 
-* get close out button to load
 * center add task button
 
 ## Installation
