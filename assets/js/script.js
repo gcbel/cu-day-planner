@@ -79,6 +79,9 @@ function renderTaskList() {
 
 /* Add a new task */
 function handleAddTask(event){
+    // Close modal after adding task
+    $('#formModal').modal('hide')
+
     // Get updated task list
     let taskList = JSON.parse(localStorage.getItem("tasks")) || [];
 
@@ -156,6 +159,7 @@ function makeDroppable() {
   });
 }
 
+/* Allow cards to be dragged and move them forward */
 function makeDraggable() {
     $('.draggable').draggable({zIndex: 1});
 }
