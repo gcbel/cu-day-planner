@@ -1,5 +1,4 @@
 /* VARIABLES */
-let taskList = JSON.parse(localStorage.getItem("tasks")) || [];
 const todoCards = $('#todo-cards');
 const inProgressCards = $('#in-progress-cards');
 const doneCards = $('#done-cards');
@@ -32,35 +31,63 @@ function createTaskCard(task) {
     card.append(cardHead)
     card.append(cardBody)
     todoCards.append(card)
+
+    // Get days
+    const today = dayjs();
+    const due = dayjs(task.date, 'DD/MM/YYYY');
+
+    // Set card color according to due date
+    if (today.isSame(due, 'day')) {
+        card.addClass('bg-warning text-white');
+    } else if (today.isAfter(due)) {
+        card.addClass('bg-danger text-white');
+        deleteBtn.addClass('border-light');
+    }
+    
     return card;
 }
 
 /* Render task list and make cards draggable */
 function renderTaskList() {
+    // Clear existing tasks 
+    todoCards.empty();
+    inProgressCards.empty();
+    doneCards.empty();
+
+    // Get updated task list
+    let taskList = JSON.parse(localStorage.getItem("tasks")) || [];
+
+    // Add each task back to task board
     for (const index in taskList) {
         const task = taskList[index];
         const card = createTaskCard(task);
 
         // Add task to relevant task list
-        if (task.status == "todo") {
+        if (task.status == "to-do") {
             todoCards.append(card);
-        } else if (task.status == "progress") {
+        } else if (task.status == "in-progress") {
             inProgressCards.append(card);
-        } else {
+        } else if (task.status == "done") {  // Specify all else if incase of incorrect status
             doneCards.append(card);
         }
     }
+    
+    /* Make cards draggable and move cards forward */
+    $('.draggable').draggable({zIndex: 1});
 }
 
 /* Add a new task */
 function handleAddTask(event){
+    // Get updated task list
+    let taskList = JSON.parse(localStorage.getItem("tasks")) || [];
+
     // Create task object
     const task = {
         id: generateTaskId(),
         title: taskTitleEl.val(),
         date: dueDateEl.val(),
         descr: taskDescrEl.val(),
-        status: "todo"
+        status: "to-do"
     }
 
     // Create and display card
@@ -83,37 +110,44 @@ function handleDeleteTask(event){
 
 /* Update status of card when dropping into a new lane */
 function handleDrop(event, ui) {
+    // Get updated task list
+    let taskList = JSON.parse(localStorage.getItem("tasks")) || [];
+
     // Get new location of card
-    const list = $(this).attr('id');
-    let newStatus = "";
-    if (list == "to-do") {
-        newStatus = "todo";
-    } else if (list == "in-progress") {
-        newStatus = "progress";
-    } else {
-        newStatus = "done";
-    }
+    const newLane = event.target.id;
 
     // Update status of card
     const targetId = ui.draggable.attr('task-id');
     for (const index in taskList) {
         const task = taskList[index]
         if (targetId == task.id) {
-            taskList[targetIndex].status = newStatus;
-            localStorage.setItem('tasks', JSON.stringify(taskList));
+            console.log(`Changing status of task #${targetId} to ${newLane}...`)
+            task.status = newLane;
+            localStorage.setItem("tasks", JSON.stringify(taskList));
             break;
         }
     }
-    $('.draggable').draggable();
+
+    // Refresh page with new placement
+    renderTaskList();
+}
+
+/* Allow cards to be dropped into lanes */
+function makeDroppable() {
+  $('.lane').droppable({
+    accept: '.draggable',
+    drop: handleDrop,
+  });
 }
 
 /* When the page loads, render the task list, add event listeners, make lanes */
 /* droppable, and make the due date field a date picker */
 $(document).ready(function () {
-    renderTaskList()
-    $('#submit-task').on('click', handleAddTask);
-    $(".droppable").droppable({drop: handleDrop});
     $('#task-due').datepicker();
     $(".sortable").sortable();
-    $('.draggable').draggable();
+    renderTaskList();  // Also makes cards draggable
+    makeDroppable();
 });
+
+/* EVENT LISTENERS */
+$('#submit-task').on('click', handleAddTask);
