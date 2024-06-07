@@ -22,7 +22,7 @@ function createTaskCard(task) {
     const cardBody = $('<div class="card-body"></div>');
     const description = $('<p></p>').text(task.descr);
     const dueDate = $('<p></p>').text(task.date);
-    const deleteBtn = $('<button class="danger">Delete</button>');
+    const deleteBtn = $('<button class="danger" id="delete-btn">Delete</button>').attr('task-id', task.id);
     
     // Assemble card
     cardBody.append(description)
@@ -44,6 +44,7 @@ function createTaskCard(task) {
         deleteBtn.addClass('border-light');
     }
     
+    makeDraggable();
     return card;
 }
 
@@ -73,7 +74,7 @@ function renderTaskList() {
     }
     
     /* Make cards draggable and move cards forward */
-    $('.draggable').draggable({zIndex: 1});
+    makeDraggable();
 }
 
 /* Add a new task */
@@ -103,9 +104,24 @@ function handleAddTask(event){
     taskDescrEl.val("");
 }
 
-// Todo: create a function to handle deleting a task
+/* Handle deleting a task */
 function handleDeleteTask(event){
+    // Get updated task list
+    let taskList = JSON.parse(localStorage.getItem("tasks")) || [];
 
+    // Remove card
+    const targetId = $(this).attr("task-id");
+    for (const index in taskList) {
+        const task = taskList[index]
+        if (targetId == task.id) {
+            console.log(`Removing task #${targetId}...`);
+            taskList.splice(index, 1);
+            localStorage.setItem("tasks", JSON.stringify(taskList));
+            break;
+        }
+    }
+
+    renderTaskList();
 }
 
 /* Update status of card when dropping into a new lane */
@@ -140,6 +156,10 @@ function makeDroppable() {
   });
 }
 
+function makeDraggable() {
+    $('.draggable').draggable({zIndex: 1});
+}
+
 /* When the page loads, render the task list, add event listeners, make lanes */
 /* droppable, and make the due date field a date picker */
 $(document).ready(function () {
@@ -151,3 +171,6 @@ $(document).ready(function () {
 
 /* EVENT LISTENERS */
 $('#submit-task').on('click', handleAddTask);
+todoCards.on('click', '#delete-btn', handleDeleteTask)
+inProgressCards.on('click', '#delete-btn', handleDeleteTask)
+doneCards.on('click', '#delete-btn', handleDeleteTask)
